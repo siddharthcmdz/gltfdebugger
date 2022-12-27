@@ -1,11 +1,22 @@
 
-enum TextureDataType {
+export enum TextureDataType {
     INT,
     Float,
     UnsignedBytes
 }
 
-class Texture {
+export enum TextureMapType {
+    Albedo,
+    Alpha,
+    Normal,
+    AO,
+    Displacement,
+    Emissive,
+    EnvMap,
+    Roughness,   
+}
+
+export class GdbTexture {
     private name: string;
     private path: string;
     private width : number;
@@ -25,18 +36,31 @@ class Texture {
     }
 };
 
-class Material {
 
+export class GdbMaterial {
+    private readonly _textureMap = new Map<TextureMapType, GdbTexture>;
+
+    constructor(texmapType : Map<TextureMapType, GdbTexture>) {
+        this._textureMap = new Map(texmapType)
+    }
+
+    public getTexture(textureMapType : TextureMapType) : GdbTexture | undefined {
+        if(this._textureMap.has(textureMapType)) {
+            return this._textureMap.get(textureMapType);
+        }
+
+        return undefined;
+    }
 };
 
-class Mesh {
+export class GdbMesh {
     private readonly _name : string ;
-    private readonly _material : Material;
+    private readonly _material : GdbMaterial;
     private readonly _numVertexAttribs : number;
     private readonly _numTriangles : number;
     private readonly _isIndexed : boolean;
     
-    constructor(name: string, material: Material, numVertexAttribs: number, numTriangles: number, isIndexed: boolean) {
+    constructor(name: string, material: GdbMaterial, numVertexAttribs: number, numTriangles: number, isIndexed: boolean) {
         this._name = name;
         this._material = material;
         this._numVertexAttribs = numVertexAttribs;
@@ -48,7 +72,7 @@ class Mesh {
         return this._name;
     }
 
-    get material() : Material {
+    get material() : GdbMaterial {
         return this._material;
     }
 
@@ -65,21 +89,3 @@ class Mesh {
     }
 
 };
-
-class ModelData {
-    private _meshes : Mesh[];
-    private _modelName : string;
-    
-    constructor(meshes : Mesh[], modelname : string) {
-        this._modelName = modelname;
-        this._meshes = meshes;
-    }
-
-    get meshes() : Mesh[] {
-        return this._meshes;
-    }
-
-    get modelName() : string {
-        return this._modelName;
-    }
-}
